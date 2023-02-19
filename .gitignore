@@ -1,0 +1,5 @@
+/node_modules
+/requests
+
+package-lock.json
+.env
