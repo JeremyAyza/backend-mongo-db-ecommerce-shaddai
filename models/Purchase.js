@@ -18,7 +18,7 @@ const PurchaseSchema = new mongoose.Schema({
 				type: Number,
 				required: true
 			},
-			price: {
+			purchase_price: {
 				type: Number,
 				required: true
 			}
@@ -35,7 +35,7 @@ const PurchaseSchema = new mongoose.Schema({
 
 PurchaseSchema.virtual('totalAmount').get(() => {
 	return this.products.reduce((total, product) => {
-		return total + (product.quantity * product.price);
+		return total + (product.quantity * product.purchase_price);
 	}, 0);
 });
 

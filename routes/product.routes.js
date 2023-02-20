@@ -14,9 +14,9 @@ productRouter.post('/', auth, adminAuth, async (req, res, next) => {
 	if (req.error) return next();
 
 	// cheking all fields
-	const { name, description, price, category, quantity, photo } = req.body;
+	const { name, description, price, category, provider, quantity, photo } = req.body;
 
-	if (!name || !description || !price || !category || !quantity || !photo) {
+	if (!name || !description || !price || !category || !provider || !quantity || !photo) {
 		req.error = {
 			status: 400,
 			message: 'All fields are required'
@@ -42,7 +42,7 @@ productRouter.post('/', auth, adminAuth, async (req, res, next) => {
 	}
 
 	try {
-		product = new Product({ name, description, price, category, quantity, photo });
+		product = new Product({ name, description, price, category, provider, quantity, photo });
 
 		await product.save()
 		res.status(201).json('Product Created Successfully');
@@ -62,8 +62,6 @@ productRouter.get('/all', async (req, res, next) => {
 
 	try {
 		let data = await Product.find({})
-			// .select('-photo')
-			// .populate('category')
 			.sort([
 				["name", "asc"]
 			])
@@ -153,8 +151,6 @@ productRouter.get('/filter', async (req, res, next) => {
 	// console.log(findArgs);
 	try {
 		let products = await Product.find(findArgs)
-			// .select('-photo')
-			// .populate('category')
 			.sort([
 				[sortBy, order]
 			])
@@ -216,11 +212,12 @@ productRouter.put('/:id', auth, adminAuth, productById, async (req, res, next) =
 
 	let product = req.product;
 
-	let { name, description, price, category, quantity, sold, photo } = req.body;
+	let { name, description, price, category, provider, quantity, sold, photo } = req.body;
 	name && (product.name = name.trim());
 	description && (product.description = description.trim());
 	price && (product.price = price);
 	category && (product.category = category);
+	provider && (product.provider = provider);
 	quantity && (product.quantity = quantity);
 	sold && (product.sold = sold);
 	photo && (product.photo = photo.trim());

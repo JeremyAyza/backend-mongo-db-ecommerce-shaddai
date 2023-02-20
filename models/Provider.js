@@ -30,12 +30,7 @@ const ProviderSchema = new mongoose.Schema({
 		unique: true,
 		trim:true
 	},
-	products: [
-		{
-			type: mongoose.Schema.Types.ObjectId,
-			ref: 'Product'
-		}
-	]
+	
 }, {
 	timestamps: true
 });

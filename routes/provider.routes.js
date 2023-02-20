@@ -4,11 +4,12 @@ const { auth, adminAuth, providerById } = require('../middleware');
 const mongoose = require('mongoose');
 
 
+const providerRouter=Router()
 providerRouter.post('/', auth, adminAuth, async (req, res, next) => {
 	if (req.error) return next();
 
 	// cheking all fields
-	const { name, email, address, phone, ruc,products } = req.body;
+	const { name, email, address, phone, ruc } = req.body;
 
 	if (!name || !email || !address || !phone || !ruc ) {
 		req.error = {
@@ -36,7 +37,7 @@ providerRouter.post('/', auth, adminAuth, async (req, res, next) => {
 	}
 
 	try {
-		provider = new Provider({ name, email, address, phone, ruc, products });
+		provider = new Provider({ name, email, address, phone, ruc  });
 		await provider.save();
 
 		res.status(201).json('Provider Created Successfully');
@@ -51,7 +52,7 @@ providerRouter.post('/', auth, adminAuth, async (req, res, next) => {
 
 
 // Ruta GET para obtener todos los proveedores
-router.get('/all', auth, adminAuth, async (req, res, next) => {
+providerRouter.get('/all', auth, adminAuth, async (req, res, next) => {
 	try {
 		// Buscamos todos los proveedores
 		const providers = await Provider.find({}).sort([
@@ -126,14 +127,13 @@ providerRouter.put('/:id', auth, adminAuth, providerById, async (req, res, next)
 	if (req.error) return next();
 
 	let provider = req.provider;
-	const { name, email, address, phone, ruc, products } = req.body;
+	const { name, email, address, phone, ruc } = req.body;
 
 	name && (provider.name = name.trim());
 	email && (provider.email = email.trim());
 	address && (provider.address = address.trim());
 	phone && (provider.phone = phone.trim());
 	ruc && (provider.ruc = ruc.trim());
-	products && (provider.products = products);
 
 	try {
 		await provider.save();
@@ -145,3 +145,14 @@ providerRouter.put('/:id', auth, adminAuth, providerById, async (req, res, next)
 		next();
 	}
 })
+
+
+providerRouter.get('/:id/productos', auth, adminAuth, async (req, res) => {
+	const proveedorId = req.params.id;
+	const productos = await Producto.find({ proveedor: proveedorId }).populate('proveedor');
+	res.json(productos);
+});
+
+module.exports = providerRouter;
+
+
