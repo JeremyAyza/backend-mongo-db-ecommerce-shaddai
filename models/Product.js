@@ -20,6 +20,13 @@ const ProductSchema = new mongoose.Schema({
 		required: true,
 		maxlength: 32
 	},
+	purchase_price: {
+		type: Number,
+		trim: true,
+		default:10, //Eliminar despues de hacer los cambios
+		required: true,
+		maxlength: 32
+	},
 	category: {
 		type: ObjectId,
 		ref: 'Category',
@@ -39,9 +46,11 @@ const ProductSchema = new mongoose.Schema({
 		required: true,
 	},
 	provider: {
-		type: mongoose.Schema.Types.ObjectId,
-		ref: 'Provider'
+		type: ObjectId,
+		ref: 'Provider',
+		require:true
 	}
+	
 
 }, {
 	timestamps: true

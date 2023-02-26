@@ -27,6 +27,8 @@ const UserSchema = new mongoose.Schema({
 		required: true,
 		default: 0
 	}
+	//AÑADIR DNI
+	//AÑADIR TELEFONO
 },
 {
 	timestamps: true

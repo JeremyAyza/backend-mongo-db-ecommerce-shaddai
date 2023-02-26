@@ -1,20 +1,53 @@
 const { Router } = require('express');
 const { check, validationResult } = require('express-validator');
 const Purchase = require('../models/purchase');
-const { auth, adminAuth,  } = require('../middleware');
+const { auth, adminAuth, purchaseById } = require('../middleware');
 
 const purchaseRouter=Router()
+
+//FUNCION PARA ACTUALIZAR EL STOCK DE CADA PRODUCTO
+//QUE SE USARÁ EN DIFERENTES OPERCIONES
+const updateProductsStock = async (purchase, operation) => {
+	try {
+		// Recorre todos los productos de la compra
+		for (const product of purchase.products) {
+			// Si la operación es 'delete', resta la cantidad de productos eliminados al stock
+			if (operation === 'delete') {
+				await Product.updateOne({ _id: product._id }, { $inc: { stock: -product.quantity } });
+				// Si la operación es 'create', suma la cantidad de productos comprados al stock
+			} else if (operation === 'create') {
+				await Product.updateOne({ _id: product._id }, { $inc: { stock: +product.quantity } });
+			}
+			// Si la operación es 'update', calcula la diferencia de cantidad y actualiza el stock en consecuencia
+			else if (operation === 'update') {
+				const purchaseDB = await Purchase.findById(purchase._id);
+				const productDB = purchaseDB.products.find(prod => prod._id.toString() === product._id.toString());
+				const diff = product.quantity - productDB.quantity;
+				if (diff > 0) {
+					await Product.updateOne({ _id: product._id }, { $inc: { stock: +diff } });
+				} else if (diff < 0) {
+					await Product.updateOne({ _id: product._id }, { $inc: { stock: -diff } });
+				}
+			}
+		}
+	} catch (error) {
+		console.log(error);
+	}
+}
+
 purchaseRouter.post('/', [
 	check('products', 'El campo Products es requerido').isArray({ min: 1 }).exists(),
-	check('products', 'Cada Producto en el campo Products requiere un atributo "productId" y "quantity", "totalAmount": [{ productId, quantity, totalAmount }]')
+	check('products', 'Cada Producto en el campo Products requiere un atributo "product" y "quantity", "totalAmount": [{ product, quantity, totalAmount }]')
 		.custom(products => {
 			let err = products.filter(e => {
-				if (!e.productId || !e.quantity || e.totalAmount) return e;
+				if (!e.product || !e.quantity) return e;
 			});
 
 			return !err.length;
 		})
+
 ], auth, adminAuth,async (req, res) => {
+
 	if (req.error) return next();
 
 	const errors = validationResult(req);
@@ -22,29 +55,22 @@ purchaseRouter.post('/', [
 		req.error = { status: 400, errors };
 		return next();
 	}
-
-	const { provider,notes,products } = req.body;
-
+		
 	try {
-		const purchase = new Purchase({ provider, notes, products });
+		// Crea la compra con los datos recibidos en el body de la petición
+		const { description, user, products } = req.body;
+
+		const purchase = new Purchase({ description, user, products });
+		// Guarda la compra en la base de datos
 		await purchase.save();
-
-		// Actualizar la cantidad de cada producto
-		for (const { productId, quantity } of products) {
-			const product = await Product.findByIdAndUpdate(productId, {
-				$inc: { quantity: +quantity },
-			})
-
-			if (!product) {
-				req.error = { status: 400, message: "Ningúno de los productos indicados están en stock" };
-				return next();
-			}
-		}
-
-
+		// Actualiza el stock de los productos en la compra
+		await updateProductsStock(purchase, 'create');
+    // Retorna un mensaje de éxito
 		
 		res.status(201).json({ message: 'Compra creada exitosamente' });
+
 	} catch (error) {
+
 		console.log(err);
 		req.error = {};
 		next();
@@ -52,19 +78,13 @@ purchaseRouter.post('/', [
 });
 
 
-
-
-
-
-
-
 purchaseRouter.delete('/:id', auth, adminAuth,async (req, res) => {
 	if (req.error) return next();
 
 	try {
-		const purchase = await Purchase.findById(req.params.id);
+		const deletePurchase = await Purchase.findByIdAndRemove(req.params.id);
 
-		if (!purchase) {
+		if (!deletePurchase) {
 			return res.status(404).json({
 				success: false,
 				message: 'Compra no encontrada',
@@ -72,20 +92,7 @@ purchaseRouter.delete('/:id', auth, adminAuth,async (req, res) => {
 		}
 
 		// Actualizar la cantidad de cada producto
-		for (const { productId, quantity } of purchase.products) {
-			const product = await Product.findByIdAndUpdate(productId, {
-				$inc: { quantity: -quantity },
-			});
-
-			if (!product) {
-				return res.status(404).json({
-					success: false,
-					message: 'Producto no encontrado',
-				});
-			}
-		}
-
-		await Purchase.findByIdAndRemove(req.params.id);
+		await updateProductsStock(deletePurchase, 'delete');
 
 		res.status(200).json({ message: 'Compra eliminada exitosamente' });
 	} catch (error) {
@@ -96,14 +103,12 @@ purchaseRouter.delete('/:id', auth, adminAuth,async (req, res) => {
 });
 
 
-
-
 purchaseRouter.put('/:id',  [
 	check('products', 'El campo Products es requerido').isArray({ min: 1 }).exists(),
-	check('products', 'Cada Producto en el campo Products requiere un atributo "productId" y "quantity", "totalAmount": [{ productId, quantity, totalAmount }]')
+	check('products', 'Cada Producto en el campo Products requiere un atributo "product" y "quantity", "totalAmount": [{ product, quantity, totalAmount }]')
 		.custom(products => {
 			let err = products.filter(e => {
-				if (!e.productId || !e.quantity || e.totalAmount) return e;
+				if (!e.product || !e.quantity ) return e;
 			});
 
 			return !err.length;
@@ -114,16 +119,16 @@ purchaseRouter.put('/:id',  [
 
 	const errors = validationResult(req);
 	if (!errors.isEmpty()) {
-
 		req.error = { status: 400, errors };
 		return next();
 	}
 
-	const { provider, notes, products } = req.body;
-	const { id } = req.params;
+
+	const { user, description, products } = req.body;
+	const id = parseInt(req.params.id) ;
 
 	try {
-		const purchase = await Purchase.findById(id);
+		const purchase = await Purchase.findByIdAndUpdate(id, { user, description, products })
 
 		if (!purchase) {
 			return res.status(404).json({
@@ -131,40 +136,10 @@ purchaseRouter.put('/:id',  [
 				message: 'Compra no encontrada',
 			});
 		}
-
+	
 		// Actualizar la cantidad de cada producto
-		for (const { productId, quantity } of purchase.products) {
-			const product = await Product.findByIdAndUpdate(productId, {
-				$inc: { quantity: -quantity },
-			})
+		await updateProductsStock(purchase, 'delete');
 
-			if (!product) {
-				return res.status(404).json({
-					success: false,
-					message: 'Producto no encontrado',
-				})
-			}
-		}
-
-		purchase.provider = provider;
-		purchase.notes = notes;
-		purchase.products = products;
-
-		await purchase.save();
-
-		// Actualizar la cantidad de cada producto
-		for (const { productId, quantity } of products) {
-			const product = await Product.findByIdAndUpdate(productId, {
-				$inc: { quantity: +quantity },
-			})
-
-			if (!product) {
-				return res.status(404).json({
-					success: false,
-					message: 'Producto no encontrado',
-				})
-			}
-		}
 
 		res.json({ message: 'Compra actualizada exitosamente' });
 	} catch (error) {
@@ -176,26 +151,14 @@ purchaseRouter.put('/:id',  [
 	}
 });
 
-purchaseRouter.get("/provider", auth, adminAuth, async (req, res, next) => {
-
-	if (req.error) return next();
-
-	try {
-		const purchases = await Order.find({ provider: req.provider.id });
-		res.status(200).json(purchases);
-	} catch (err) {
-		console.log(err);
-		req.error = {};
-		next();
-	}
-});
 
 purchaseRouter.get('/', auth, adminAuth, async (req, res) => {
 	if (req.error) return next();
 
 	try {
-		const purchases = await Purchase.find().populate('provider products.product');
-
+		const purchases = await Purchase.find()
+		.populate('user.name')
+		.populate('products.product');
 		res.json(purchases);
 	} catch (error) {
 		console.error(error);
@@ -204,26 +167,13 @@ purchaseRouter.get('/', auth, adminAuth, async (req, res) => {
 	}
 });
 
-// GET /purchases/:id
-purchaseRouter.get('/:id', async (req, res) => {
+purchaseRouter.get('/:id',purchaseById,(req, res,next) => {
 	if (req.error) return next();
-
-	try {
-		const purchase = await Purchase.findById(req.params.id)
-			.populate('provider', 'name')
-			.populate('products.product');
-		if (!purchase) {
-			req.error={status:404, message: 'Compra no encontrada' }
-			return next();
-
-
-		}
-		return res.json(purchase);
-	} catch (error) {
-		console.error(error);
-		next();
-		return res.status(500).json({ message: 'Error en el servidor' });
-	}
+	return (
+		res.json(req.product)
+			.populate('user','name')
+			.populate('products.product')
+	)
 });
 
 

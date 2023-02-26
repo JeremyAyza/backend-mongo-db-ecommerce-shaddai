@@ -14,9 +14,9 @@ productRouter.post('/', auth, adminAuth, async (req, res, next) => {
 	if (req.error) return next();
 
 	// cheking all fields
-	const { name, description, price, category, provider, quantity, photo } = req.body;
+	const { name, description, price, purchase_price, category, provider, quantity, photo } = req.body;
 
-	if (!name || !description || !price || !category || !provider || !quantity || !photo) {
+	if (!name || !description || !price || !category || !provider || !quantity || !photo || !purchase_price) {
 		req.error = {
 			status: 400,
 			message: 'All fields are required'
@@ -42,7 +42,7 @@ productRouter.post('/', auth, adminAuth, async (req, res, next) => {
 	}
 
 	try {
-		product = new Product({ name, description, price, category, provider, quantity, photo });
+		product = new Product({ name, description, price, category, provider, quantity, photo, purchase_price });
 
 		await product.save()
 		res.status(201).json('Product Created Successfully');
@@ -54,6 +54,21 @@ productRouter.post('/', auth, adminAuth, async (req, res, next) => {
 	}
 });
 
+//router.post('/compras', async (req, res) => {
+//	const compra = new Purchase(req.body);
+//	try {
+//		// Guardar la compra en la base de datos
+//		await compra.save();
+//		// Actualizar el stock de los productos comprados
+//		for (const item of compra.productos) {
+//			await Product.updateOne({ _id: item.producto }, { $inc: { stock: -item.cantidad } });
+//		}
+//		res.status(201).send(compra);
+//	} catch (error) {
+//		res.status(400).send(error);
+//	}
+//});
+
 
 // @route GET api/product/all
 // @desc Get all products
@@ -62,6 +77,8 @@ productRouter.get('/all', async (req, res, next) => {
 
 	try {
 		let data = await Product.find({})
+			.populate('category')
+			.populate('provider', 'name')
 			.sort([
 				["name", "asc"]
 			])
@@ -105,7 +122,8 @@ productRouter.get('/search', async (req, res, next) => {
 
 	try {
 		let products = await Product.find(query)
-			// .select('-photo')
+			.populate('category')
+			.populate('provider', 'name')
 			.sort([
 				["name", "asc"]
 			]);
@@ -151,6 +169,8 @@ productRouter.get('/filter', async (req, res, next) => {
 	// console.log(findArgs);
 	try {
 		let products = await Product.find(findArgs)
+			.populate('category')
+			.populate('provider', 'name')
 			.sort([
 				[sortBy, order]
 			])
@@ -178,7 +198,11 @@ productRouter.get('/:id', productById, (req, res, next) => {
 	if (req.error) return next();
 
 	// req.product.photo = undefined;
-	return res.json(req.product);
+	return( 
+		res.json(req.product)
+		.populate('category')
+		.populate('provider', 'name')
+	)
 });
 
 
@@ -216,6 +240,7 @@ productRouter.put('/:id', auth, adminAuth, productById, async (req, res, next) =
 	name && (product.name = name.trim());
 	description && (product.description = description.trim());
 	price && (product.price = price);
+	purchase_price && (product.purchase_price = purchase_price);
 	category && (product.category = category);
 	provider && (product.provider = provider);
 	quantity && (product.quantity = quantity);

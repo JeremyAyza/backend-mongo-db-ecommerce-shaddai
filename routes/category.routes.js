@@ -57,7 +57,9 @@ categoryRouter.post('/', [
 // @access Public
 categoryRouter.get('/all', async (req, res, next) => {
    try {
-      let data = await Category.find({});
+		 let data = await Category.find({}).sort([
+			 ["name", "asc"]
+		 ]);
       res.json(data);
    } catch (err) {
       console.log(err);

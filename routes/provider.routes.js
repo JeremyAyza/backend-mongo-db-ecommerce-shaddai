@@ -5,6 +5,8 @@ const mongoose = require('mongoose');
 
 
 const providerRouter=Router()
+
+
 providerRouter.post('/', auth, adminAuth, async (req, res, next) => {
 	if (req.error) return next();
 
@@ -49,16 +51,12 @@ providerRouter.post('/', auth, adminAuth, async (req, res, next) => {
 	}
 });
 
-
-
 // Ruta GET para obtener todos los proveedores
 providerRouter.get('/all', auth, adminAuth, async (req, res, next) => {
 	try {
 		// Buscamos todos los proveedores
-		const providers = await Provider.find({}).sort([
-			["name", "asc"]
-		]);
-
+		const providers = await Provider.find({}).
+		
 		// Enviamos la respuesta con los proveedores
 		res.json(providers);
 	} catch (err) {
@@ -68,7 +66,6 @@ providerRouter.get('/all', auth, adminAuth, async (req, res, next) => {
 		next();
 	}
 });
-
 
 providerRouter.get('/search', async (req, res, next) => {
 	let { search } = req.query;
@@ -96,14 +93,12 @@ providerRouter.get('/search', async (req, res, next) => {
 	}
 });
 
-
 providerRouter.get('/:id', providerById, (req, res, next) => {
 
 	if (req.error) return next();
 
 	return res.json(req.provider);
 });
-
 
 providerRouter.delete('/:id', auth, adminAuth, providerById, async (req, res, next) => {
 
@@ -146,7 +141,7 @@ providerRouter.put('/:id', auth, adminAuth, providerById, async (req, res, next)
 	}
 })
 
-
+//TRAER A LOS PRODUCTOS DE UN PROVEEDOR ESPECIFICO
 providerRouter.get('/:id/productos', auth, adminAuth, async (req, res) => {
 	const proveedorId = req.params.id;
 	const productos = await Producto.find({ proveedor: proveedorId }).populate('proveedor');

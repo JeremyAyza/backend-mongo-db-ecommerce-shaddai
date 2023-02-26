@@ -6,4 +6,6 @@ module.exports = {
 	errorHandler: require("./errorHandler"),
 	productById: require("./productById"),
 	providerById: require("./providerById"),
+	purchaseById: require("./puchaseById"),
+
 }

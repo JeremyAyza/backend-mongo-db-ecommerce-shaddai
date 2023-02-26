@@ -16,7 +16,8 @@ module.exports = async (req, res, next) => {
    }
 
    try {
-      let provider = await Provider.findById(id).populate('producto');
+		//llamamos al proveedor con
+      let provider = await Provider.findById(id)
 
       if (!provider) {
          req.error = {
