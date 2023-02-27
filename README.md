@@ -1,2 +1,3 @@
 # tienda-backend
-Backend para la tienda virtual del proyecto de Programación Orientada a Objetos
+Backend para la tienda virtual del proyecto de certificador
+
