@@ -380,14 +380,14 @@ module.exports = (nombreCompleto, nombreTienda, pedido, productos) => `
                                                   >
                                                     &nbsp;&nbsp;&nbsp;
                                                     <a
-                                                      href="https://ecommerce-minimarket-yerik.vercel.app"
+                                                      href=""
                                                       style="color: #020202"
                                                       target="_blank"
                                                       >COMPRAR</a
                                                     >
                                                     &nbsp;&nbsp;&nbsp;
                                                     <a
-                                                      href="mailto:viviana.calva@unl.edu.ec"
+                                                      href=""
                                                       style="color: #020202"
                                                       target="_blank"
                                                       >CONT&Aacute;CTANOS</a
@@ -846,7 +846,7 @@ module.exports = (nombreCompleto, nombreTienda, pedido, productos) => `
                                                                                     valign="middle"
                                                                                   >
                                                                                     <a
-                                                                                      href="https://ecommerce-minimarket-yerik.vercel.app"
+                                                                                      href=""
                                                                                       style="
                                                                                         color: #020202;
                                                                                       "
@@ -1754,7 +1754,7 @@ ${productos.reduce((prev, current) => prev + current, "")}
                                                                             valign="middle"
                                                                           >
                                                                             <a
-                                                                              href="mailto:viviana.calva@unl.edu.ec"
+                                                                              href=""
                                                                               style="
                                                                                 color: #ffffff;
                                                                               "

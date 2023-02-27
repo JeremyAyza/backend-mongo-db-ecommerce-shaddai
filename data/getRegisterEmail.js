@@ -393,7 +393,7 @@ module.exports = (nombreCompleto) => `
                                     <tr>
                                       <td>
                                         <a
-                                          href="https://ecommerce-minimarket-yerik.vercel.app"
+                                          href="#"
                                           target="_blank"
                                           >Empezar a comprar</a
                                         >
@@ -442,7 +442,7 @@ module.exports = (nombreCompleto) => `
                 </tr>
                 <tr>
                   <td class="content-block powered-by">
-                    <a href="mailto:vivicalvat007@gmail.com"
+                    <a href=""
                       >Escríbenos tus dudas</a
                     >.
                   </td>
