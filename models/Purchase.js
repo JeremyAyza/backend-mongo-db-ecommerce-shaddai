@@ -2,7 +2,11 @@ const mongoose = require('mongoose');
 const { ObjectId } = mongoose.Schema;
 
 const PurchaseSchema = new mongoose.Schema({
-	user: { type: ObjectId, ref: 'User',required: true },
+	user: { 
+		type: ObjectId,
+		ref: 'User',
+		require: true 
+	},
 	products: [
 		{
 			product: {
@@ -25,11 +29,13 @@ const PurchaseSchema = new mongoose.Schema({
 });
 
 
-PurchaseSchema.virtual('totalAmount').get(() => {
+
+PurchaseSchema.virtual('totalAmount').get(function () {
 	return this.products.reduce((total, product) => {
-		return total + (product.quantity * product.purchase_price);
+		return total + (product.quantity * product.product.purchase_price);
 	}, 0);
 });
+
 
 //purchaseSchema.post('save', async function () {
 //	const Product = mongoose.model('Producto');

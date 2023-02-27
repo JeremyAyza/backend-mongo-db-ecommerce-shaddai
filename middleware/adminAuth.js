@@ -1,6 +1,7 @@
 const User = require('../models/User');
 
 module.exports = async (req, res, next) => {
+	console.log(req.error);
 
 	if (req.error) return next();
 

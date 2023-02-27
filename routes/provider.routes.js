@@ -1,5 +1,6 @@
 const { Router } = require('express');
 const Provider = require('../models/Provider');
+console.log(Provider);
 const { auth, adminAuth, providerById } = require('../middleware');
 const mongoose = require('mongoose');
 
@@ -52,10 +53,11 @@ providerRouter.post('/', auth, adminAuth, async (req, res, next) => {
 });
 
 // Ruta GET para obtener todos los proveedores
-providerRouter.get('/all', auth, adminAuth, async (req, res, next) => {
+providerRouter.get('/all', async (req, res, next) => {
 	try {
 		// Buscamos todos los proveedores
-		const providers = await Provider.find({}).
+		console.log('consulta all provider');
+		const providers = await Provider.find()
 		
 		// Enviamos la respuesta con los proveedores
 		res.json(providers);

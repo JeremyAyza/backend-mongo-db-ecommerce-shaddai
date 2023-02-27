@@ -1,7 +1,8 @@
 const { Router } = require('express');
 const { check, validationResult } = require('express-validator');
-const Purchase = require('../models/purchase');
+const Purchase = require('../models/Purchase');
 const { auth, adminAuth, purchaseById } = require('../middleware');
+const Product = require('../models/Product');
 
 const purchaseRouter=Router()
 
@@ -13,10 +14,10 @@ const updateProductsStock = async (purchase, operation) => {
 		for (const product of purchase.products) {
 			// Si la operación es 'delete', resta la cantidad de productos eliminados al stock
 			if (operation === 'delete') {
-				await Product.updateOne({ _id: product._id }, { $inc: { stock: -product.quantity } });
+				await Product.updateOne({ _id: product.product._id }, { $inc: { quantity: -product.quantity } });
 				// Si la operación es 'create', suma la cantidad de productos comprados al stock
 			} else if (operation === 'create') {
-				await Product.updateOne({ _id: product._id }, { $inc: { stock: +product.quantity } });
+				await Product.updateOne({ _id: product.product._id }, { $inc: { quantity: +product.quantity } });
 			}
 			// Si la operación es 'update', calcula la diferencia de cantidad y actualiza el stock en consecuencia
 			else if (operation === 'update') {
@@ -24,9 +25,9 @@ const updateProductsStock = async (purchase, operation) => {
 				const productDB = purchaseDB.products.find(prod => prod._id.toString() === product._id.toString());
 				const diff = product.quantity - productDB.quantity;
 				if (diff > 0) {
-					await Product.updateOne({ _id: product._id }, { $inc: { stock: +diff } });
+					await Product.updateOne({ _id: product._id }, { $inc: { quantity: +diff } });
 				} else if (diff < 0) {
-					await Product.updateOne({ _id: product._id }, { $inc: { stock: -diff } });
+					await Product.updateOne({ _id: product._id }, { $inc: { quantity: -diff } });
 				}
 			}
 		}
@@ -34,6 +35,23 @@ const updateProductsStock = async (purchase, operation) => {
 		console.log(error);
 	}
 }
+purchaseRouter.get('/all', auth, adminAuth, async (req, res, next) => {
+	if (req.error) return next()
+
+	try {
+		console.log('se intentó');
+		const purchases = await Purchase.find()
+			.populate('products.product', 'name price category provider purchase_price')
+			.populate('user', 'name').lean({ virtuals: true })
+
+
+		res.json(purchases);
+	} catch (error) {
+		console.error(error);
+		next();
+		res.status(500).json({ message: 'Error en el servidor' });
+	}
+});
 
 purchaseRouter.post('/', [
 	check('products', 'El campo Products es requerido').isArray({ min: 1 }).exists(),
@@ -46,7 +64,7 @@ purchaseRouter.post('/', [
 			return !err.length;
 		})
 
-], auth, adminAuth,async (req, res) => {
+], auth, adminAuth, async (req, res, next) => {
 
 	if (req.error) return next();
 
@@ -66,19 +84,20 @@ purchaseRouter.post('/', [
 		// Actualiza el stock de los productos en la compra
 		await updateProductsStock(purchase, 'create');
     // Retorna un mensaje de éxito
+
 		
 		res.status(201).json({ message: 'Compra creada exitosamente' });
 
 	} catch (error) {
 
-		console.log(err);
+		console.log(error);
 		req.error = {};
 		next();
 	}
 });
 
 
-purchaseRouter.delete('/:id', auth, adminAuth,async (req, res) => {
+purchaseRouter.delete('/:id', auth, adminAuth,async (req, res,next) => {
 	if (req.error) return next();
 
 	try {
@@ -113,7 +132,7 @@ purchaseRouter.put('/:id',  [
 
 			return !err.length;
 		})
-], auth, adminAuth, async (req, res) => {
+], auth, adminAuth, async (req, res,next) => {
 
 	if (req.error) return next();
 
@@ -125,7 +144,7 @@ purchaseRouter.put('/:id',  [
 
 
 	const { user, description, products } = req.body;
-	const id = parseInt(req.params.id) ;
+	const id = req.params.id ;
 
 	try {
 		const purchase = await Purchase.findByIdAndUpdate(id, { user, description, products })
@@ -138,43 +157,25 @@ purchaseRouter.put('/:id',  [
 		}
 	
 		// Actualizar la cantidad de cada producto
-		await updateProductsStock(purchase, 'delete');
+		await updateProductsStock(purchase, 'update');
 
 
 		res.json({ message: 'Compra actualizada exitosamente' });
 	} catch (error) {
 		console.error(error);
-
-		console.log(err);
 		req.error = {};
 		next();
-	}
-});
-
-
-purchaseRouter.get('/', auth, adminAuth, async (req, res) => {
-	if (req.error) return next();
-
-	try {
-		const purchases = await Purchase.find()
-		.populate('user.name')
-		.populate('products.product');
-		res.json(purchases);
-	} catch (error) {
-		console.error(error);
-		next();
-		res.status(500).json({ message: 'Error en el servidor' });
 	}
 });
 
 purchaseRouter.get('/:id',purchaseById,(req, res,next) => {
 	if (req.error) return next();
 	return (
-		res.json(req.product)
-			.populate('user','name')
-			.populate('products.product')
+		res.json(req.purchase)
+			
 	)
 });
+
 
 
 

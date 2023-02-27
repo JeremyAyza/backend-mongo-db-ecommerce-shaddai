@@ -3,22 +3,22 @@ const Purchase = require('../models/Purchase');
 
 
 module.exports = async (req, res, next) => {
-	const id  = parseInt(req.params.id) ;
+	const id  = req.params.id ;
 
 	if (req.error) return next();
 
 	if (!mongoose.Types.ObjectId.isValid(id)) {
 		req.error = {
 			status: 400,
-			message: 'Id provided is not valid'
+			message: 'Id purchase is not valid'
 		};
 		return next();
 	}
 
 	try {
 		let purchase = await Purchase.findById(id)
-		.populate('products.product')
-		.populate('user','name',);
+			.populate('products.product','name price category provider purchase_price')
+			.populate('user', 'name',).lean({ virtuals: true })
 
 		if (!purchase) {
 			req.error = {

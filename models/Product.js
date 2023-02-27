@@ -23,7 +23,6 @@ const ProductSchema = new mongoose.Schema({
 	purchase_price: {
 		type: Number,
 		trim: true,
-		default:10, //Eliminar despues de hacer los cambios
 		required: true,
 		maxlength: 32
 	},

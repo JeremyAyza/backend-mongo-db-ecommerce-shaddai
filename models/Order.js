@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const { PENDING } = require('../helpers/constants');
 const { ObjectId } = mongoose.Schema;
 
-const UserSchema = new mongoose.Schema({
+const OrderShema = new mongoose.Schema({
 	country: {
 		type: String,
 		required: true
@@ -55,4 +55,4 @@ const UserSchema = new mongoose.Schema({
 	timestamps: true
 })
 
-module.exports = User = mongoose.model('Order', UserSchema);
+module.exports = User = mongoose.model('Order', OrderShema);

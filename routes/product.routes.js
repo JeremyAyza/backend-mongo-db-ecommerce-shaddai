@@ -236,7 +236,7 @@ productRouter.put('/:id', auth, adminAuth, productById, async (req, res, next) =
 
 	let product = req.product;
 
-	let { name, description, price, category, provider, quantity, sold, photo } = req.body;
+	let { name, description, price, category, provider, quantity, sold, photo, purchase_price } = req.body;
 	name && (product.name = name.trim());
 	description && (product.description = description.trim());
 	price && (product.price = price);

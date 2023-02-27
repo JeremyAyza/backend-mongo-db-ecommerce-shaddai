@@ -26,9 +26,18 @@ const UserSchema = new mongoose.Schema({
 		type: Number,
 		required: true,
 		default: 0
+	},
+	dni:{
+		type: String,
+		default:"88776633",
+		maxlength: 8,
+	},
+	phone: {
+		type: String,
+		default:"999888777",
+		maxlength: 9,
 	}
-	//AÑADIR DNI
-	//AÑADIR TELEFONO
+	
 },
 {
 	timestamps: true
