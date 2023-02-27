@@ -200,8 +200,6 @@ productRouter.get('/:id', productById, (req, res, next) => {
 	// req.product.photo = undefined;
 	return( 
 		res.json(req.product)
-		.populate('category')
-		.populate('provider', 'name')
 	)
 });
 
