@@ -23,6 +23,10 @@ const PurchaseSchema = new mongoose.Schema({
 	description: {
 		type: String,
 		default:""
+	},
+	totalAmount: {
+		type: Number,
+		default: 0
 	}
 }, {
 	timestamps: true
@@ -30,11 +34,27 @@ const PurchaseSchema = new mongoose.Schema({
 
 
 
-PurchaseSchema.virtual('totalAmount').get(function () {
-	return this.products.reduce((total, product) => {
-		return total + (product.quantity * product.product.purchase_price);
-	}, 0);
+// Función que se ejecuta antes de guardar o actualizar una compra
+PurchaseSchema.pre('save', async function (next) {
+	try {
+		let totalAmount = 0;
+		// Recorre todos los productos de la compra y calcula el totalAmount
+		for (let i = 0; i < this.products.length; i++) {
+			const product = await mongoose.model('Product').findById(this.products[i].product);
+			totalAmount += product.price * this.products[i].quantity;
+		}
+		this.totalAmount = totalAmount;
+		next();
+	} catch (error) {
+		next(error);
+	}
 });
+
+//PurchaseSchema.virtual('totalAmount').get(function () {
+//	return this.products.reduce((total, product) => {
+//		return total + (product.quantity * product.product.purchase_price);
+//	}, 0);
+//});
 
 
 //purchaseSchema.post('save', async function () {

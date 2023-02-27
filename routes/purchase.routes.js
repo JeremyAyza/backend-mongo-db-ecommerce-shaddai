@@ -39,11 +39,9 @@ purchaseRouter.get('/all', auth, adminAuth, async (req, res, next) => {
 	if (req.error) return next()
 
 	try {
-		console.log('se intentó');
 		const purchases = await Purchase.find()
-			.populate('products.product', 'name price category provider purchase_price')
-			.populate('user', 'name').lean({ virtuals: true })
-
+			.populate('products.product', 'name price category provider purchase_price').lean({ virtuals: true })
+			.populate('user', 'name')
 
 		res.json(purchases);
 	} catch (error) {
