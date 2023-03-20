@@ -432,10 +432,10 @@ module.exports = (nombreCompleto) => `
                 <tr>
                   <td class="content-block">
                     <span class="apple-link"
-                      >Minimarket Yerick <br />
-                      Loja, Ecuador
+                      >Shaddai Import Ecommerce <br />
+                      Lima, Perú
                       <br />
-                      Av. Occidental y Calle Olivos
+                      Av. Los Heroes 225
                     </span>
                     <br />
                   </td>

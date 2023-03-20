@@ -1971,7 +1971,7 @@ ${productos.reduce((prev, current) => prev + current, "")}
                                             "
                                             valign="middle"
                                           >
-                                            MINIMARKET YERICK &copy; 2022.
+                                            SHADDAI IMPORT ECOMMERCE &copy; 2022.
                                             DERECHOS RESERVADOS.
                                           </td>
                                         </tr>

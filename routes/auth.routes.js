@@ -209,7 +209,7 @@ authRouter.post('/register', [
 
 				// send mail with defined transport object
 				await transporter.sendMail({
-					from: '"Bienvenidx a Minimarket Yerick" <vivicalvat007@gmail.com>',     // emisor
+					from: '"Bienvenidx a Ecommerce" <vivicalvat007@gmail.com>',     // emisor
 					to: email,                                      // destinatario/os
 					subject: "BIENVENIDX A NUESTRO ECOMMERCE",      // Asunto
 					html: getRegisterEmail(name + " " + lastname),   //html body
