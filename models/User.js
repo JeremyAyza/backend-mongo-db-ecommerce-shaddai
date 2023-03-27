@@ -20,6 +20,7 @@ const UserSchema = new mongoose.Schema({
 	},
 	avatar: {
 		type: String,
+		default:"https://img.freepik.com/vector-premium/perfil-avatar-hombre-icono-redondo_24640-14044.jpg"
 	},
 	role: {
 		// Determina los privilegios que tiene (normal:0 o admin:1 bloqueado: 3)

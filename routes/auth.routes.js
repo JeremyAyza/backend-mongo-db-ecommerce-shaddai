@@ -138,6 +138,8 @@ authRouter.put('/unlock/:userId',
 authRouter.post('/register', [
 	// validaciones
 	check('name', 'El nombre es requerido').not().isEmpty(),
+	check('phone', 'El celular es requerido').not().isEmpty(),
+	check('dni', 'El phone es requerido').not().isEmpty(),
 	check('lastname', 'El apellido es requerido').not().isEmpty(),
 	check('address', 'La dirección es requerida').not().isEmpty(),
 	check('email', 'Por favor incluya un email válido').isEmail(),
@@ -155,7 +157,7 @@ authRouter.post('/register', [
 	}
 
 	// si todo está bien, extraigo el nombre, apellido e email...
-	const { name, lastname, email, password, address } = req.body;
+	const { name, lastname, email, password, address,phone,dni } = req.body;
 
 	try {
 		let user = await User.findOne({ email });
@@ -178,7 +180,7 @@ authRouter.post('/register', [
 
 		// creamos el usuario
 		user = new User({
-			name, lastname, email, avatar, password, address
+			name, lastname, email, avatar, password, address, phone, dni
 		})
 
 		// encriptamos la contraseña
@@ -211,7 +213,7 @@ authRouter.post('/register', [
 				await transporter.sendMail({
 					from: '"Bienvenidx a Ecommerce" <vivicalvat007@gmail.com>',     // emisor
 					to: email,                                      // destinatario/os
-					subject: "BIENVENIDX A NUESTRO ECOMMERCE",      // Asunto
+					subject: "BIENVENIDO A NUESTRO ECOMMERCE",      // Asunto
 					html: getRegisterEmail(name + " " + lastname),   //html body
 				});
 
