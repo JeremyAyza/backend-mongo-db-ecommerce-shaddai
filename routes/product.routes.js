@@ -79,9 +79,7 @@ productRouter.get('/all', async (req, res, next) => {
 		let data = await Product.find({})
 			.populate('category')
 			.populate('provider', 'name')
-			.sort([
-				["name", "asc"]
-			])
+			
 
 		res.json(data);
 	} catch (err) {
@@ -124,9 +122,7 @@ productRouter.get('/search', async (req, res, next) => {
 		let products = await Product.find(query)
 			.populate('category')
 			.populate('provider', 'name')
-			.sort([
-				["name", "asc"]
-			]);
+			
 		res.json(products);
 	} catch (err) {
 		console.log(err);
