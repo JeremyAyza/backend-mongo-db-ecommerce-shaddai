@@ -2,11 +2,7 @@ const mongoose = require('mongoose');
 const { ObjectId } = mongoose.Schema;
 
 const PurchaseSchema = new mongoose.Schema({
-	user: { 
-		type: ObjectId,
-		ref: 'User',
-		require: true 
-	},
+
 	products: [
 		{
 			product: {
@@ -20,13 +16,14 @@ const PurchaseSchema = new mongoose.Schema({
 			}	
 		}
 	],
-	description: {
-		type: String,
-		default:""
-	},
 	totalAmount: {
 		type: Number,
 		default: 0
+	},
+	paid: {
+		type: Boolean,
+		required: true,
+		default: false
 	}
 }, {
 	timestamps: true
@@ -41,7 +38,7 @@ PurchaseSchema.pre('save', async function (next) {
 		// Recorre todos los productos de la compra y calcula el totalAmount
 		for (let i = 0; i < this.products.length; i++) {
 			const product = await mongoose.model('Product').findById(this.products[i].product);
-			totalAmount += product.price * this.products[i].quantity;
+			totalAmount += product.purchase_price * this.products[i].quantity;
 		}
 		this.totalAmount = totalAmount;
 		next();

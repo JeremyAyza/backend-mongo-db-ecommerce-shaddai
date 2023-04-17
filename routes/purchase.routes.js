@@ -74,9 +74,9 @@ purchaseRouter.post('/', [
 		
 	try {
 		// Crea la compra con los datos recibidos en el body de la petición
-		const { description, user, products } = req.body;
+		const { products } = req.body;
 
-		const purchase = new Purchase({ description, user, products });
+		const purchase = new Purchase({ products });
 		// Guarda la compra en la base de datos
 		await purchase.save();
 		// Actualiza el stock de los productos en la compra
@@ -141,11 +141,11 @@ purchaseRouter.put('/:id',  [
 	}
 
 
-	const { user, description, products } = req.body;
+	const { user, description, products, paid } = req.body;
 	const id = req.params.id ;
 
 	try {
-		const purchase = await Purchase.findByIdAndUpdate(id, { user, description, products })
+		const purchase = await Purchase.findByIdAndUpdate(id, { user, description, products, paid })
 
 		if (!purchase) {
 			return res.status(404).json({

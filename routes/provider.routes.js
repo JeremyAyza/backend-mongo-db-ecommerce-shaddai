@@ -1,4 +1,5 @@
 const { Router } = require('express');
+const Producto=require('../models/Product')
 const Provider = require('../models/Provider');
 console.log(Provider);
 const { auth, adminAuth, providerById } = require('../middleware');
@@ -144,10 +145,14 @@ providerRouter.put('/:id', auth, adminAuth, providerById, async (req, res, next)
 })
 
 //TRAER A LOS PRODUCTOS DE UN PROVEEDOR ESPECIFICO
-providerRouter.get('/:id/productos', auth, adminAuth, async (req, res) => {
-	const proveedorId = req.params.id;
-	const productos = await Producto.find({ proveedor: proveedorId }).populate('proveedor');
-	res.json(productos);
+providerRouter.get('/:id/products',  async (req, res) => {
+	try {
+		const proveedorId = req.params.id;
+		const productos = await Producto.find({ provider: proveedorId }).populate('provider');
+		res.json(productos);
+	} catch(error) {
+		res.status(404).json([])
+	}
 });
 
 module.exports = providerRouter;
