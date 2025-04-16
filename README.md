@@ -66,8 +66,12 @@
 
 ### 🧠 Retos y Aprendizajes
 
-- Integración completa del flujo de pago usando Stripe
-- Arquitectura clara y separada por capas en el backend
-- Uso de redux-thunk para manejar operaciones asíncronas como login, registro y gestión de órdenes
-- Validaciones robustas de inputs con express-validator
-- Modularización de rutas, middlewares y controladores en Express
+- 🧠 Retos y Aprendizajes
+- 🔄 Conexión entre frontend y backend: Implementé una comunicación fluida entre React y Express, manejando correctamente estados de carga, errores, y respuestas de la API.
+- 🔐 Autenticación y autorización robusta: Desarrollé un sistema seguro de login y registro con JWT, incluyendo protección de rutas en backend y frontend.
+- 💳 Integración de Stripe: Configuré pagos con Stripe, gestionando tokens y flujos de compra de extremo a extremo desde React hasta el backend.
+- 🧰 Arquitectura modular y mantenible: Separé responsabilidades en controladores, middlewares, modelos y rutas tanto en Express como en Redux para facilitar el mantenimiento.
+- 📦 Manejo de estado global con Redux: Utilicé Redux junto con redux-thunk para controlar flujos asincrónicos (auth, carrito, órdenes), manteniendo una lógica de negocio clara en el frontend.
+- 🎨 UI adaptativa y reusable: Construí componentes reutilizables con React Bootstrap y gestioné la experiencia del usuario con notificaciones dinámicas usando react-toastify.
+- 🔍 Validaciones completas: Validé inputs desde el cliente con React y del lado servidor con express-validator para garantizar integridad de los datos.
+- 📬 Notificaciones y feedback en tiempo real: Implementé alertas visuales para acciones clave del usuario, mejorando la usabilidad.
